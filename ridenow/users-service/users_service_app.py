@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 # -----------------------------
 # Database setup (SQLite locale)
 # -----------------------------
-DATABASE_URL = "sqlite:///./users.db"  # fichier users.db créé dans ce dossier
+DATABASE_URL = "sqlite:///./data/users.db"  # fichier users.db créé dans ce dossier
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}

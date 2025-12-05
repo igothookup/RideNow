@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 # -----------------------------
 # Database setup (SQLite locale)
 # -----------------------------
-DATABASE_URL = "sqlite:///./pricing.db"  # fichier pricing.db dans ce dossier
+DATABASE_URL = "sqlite:///./data/pricing.db"  # fichier pricing.db dans ce dossier
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}

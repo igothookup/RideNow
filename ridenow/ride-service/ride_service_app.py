@@ -7,7 +7,7 @@ import requests
 # -----------------------------------------------------
 # DB locale SQLite (ride.db)
 # -----------------------------------------------------
-DATABASE_URL = "sqlite:///./rides.db"
+DATABASE_URL = "sqlite:///./data/rides.db"
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
@@ -35,9 +35,13 @@ Base.metadata.create_all(bind=engine)
 # -----------------------------------------------------
 # Config — URLs des autres services
 # -----------------------------------------------------
-USERS_URL = "http://localhost:8001"
-PRICING_URL = "http://localhost:8002"
-PAYMENT_URL = "http://localhost:8003"
+#USERS_URL = "http://localhost:8001"
+#PRICING_URL = "http://localhost:8002"
+#PAYMENT_URL = "http://localhost:8003"
+USERS_URL = "http://users-service:8001"
+PRICING_URL = "http://pricing-service:8002"
+PAYMENT_URL = "http://payment-service:8003"
+
 
 # -----------------------------------------------------
 # Schemas Pydantic
