@@ -111,6 +111,15 @@ def create_ride(payload: RideCreate, db: Session = Depends(get_db)):
     driver_id = driver["id"]
     print(f"[Ride] Selected driver: {driver_id}")
 
+    # Marquer le driver comme indisponible
+    resp = requests.patch(
+        f"{USERS_URL}/drivers/{driver_id}/availability",
+        json={"available": False},
+    )
+    if resp.status_code != 200:
+        print("[Ride] WARNING: failed to update driver availability")
+
+
     # 2. Récupérer le prix
     print("[Ride] Fetching price...")
     p = requests.get(
@@ -158,6 +167,59 @@ def create_ride(payload: RideCreate, db: Session = Depends(get_db)):
     print("[Ride] Payment authorized.")
 
     return ride
+
+
+@app.post("/rides/{ride_id}/complete", response_model=RideRead)
+def complete_ride(ride_id: int, db: Session = Depends(get_db)):
+    print(f"[Ride] Completing ride {ride_id}...")
+
+    # 1. Récupérer la ride
+    ride = db.query(Ride).filter(Ride.id == ride_id).first()
+    if not ride:
+        raise HTTPException(status_code=404, detail="Ride not found")
+
+    if ride.status != "ASSIGNED":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot complete ride in status {ride.status}",
+        )
+
+    # 2. Capturer le paiement si on a un payment_id
+    if ride.payment_id is not None:
+        print(f"[Ride] Capturing payment {ride.payment_id}...")
+        pay_resp = requests.post(
+            f"{PAYMENT_URL}/payments/capture",
+            json={"payment_id": ride.payment_id},
+        )
+        if pay_resp.status_code != 200:
+            # On peut choisir : soit on bloque, soit on log juste
+            print("[Ride] WARNING: payment capture failed")
+            raise HTTPException(
+                status_code=500,
+                detail="Payment capture failed",
+            )
+    else:
+        print("[Ride] No payment_id on this ride, skipping capture")
+
+    # 3. Remettre le driver disponible
+    if ride.driver_id is not None:
+        print(f"[Ride] Setting driver {ride.driver_id} available=true...")
+        drv_resp = requests.patch(
+            f"{USERS_URL}/drivers/{ride.driver_id}/availability",
+            json={"available": True},
+        )
+        if drv_resp.status_code != 200:
+            print("[Ride] WARNING: failed to update driver availability")
+
+    # 4. Mettre à jour le statut de la ride
+    ride.status = "COMPLETED"
+    db.commit()
+    db.refresh(ride)
+
+    print(f"[Ride] Ride {ride.id} completed.")
+
+    return ride
+
 
 
 @app.get("/rides/{ride_id}", response_model=RideRead)

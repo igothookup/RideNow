@@ -346,22 +346,16 @@ This demonstrates a typical microservices orchestration pattern where one servic
 2. **Setup Test Data:**
    ```bash
    # Create a driver in zone A
-   curl -X POST "http://localhost:8001/drivers" \
-     -H "Content-Type: application/json" \
-     -d '{"name": "John Doe", "zone": "A", "available": true}'
+   curl -X POST "http://localhost:8001/drivers" -H "Content-Type: application/json" -d '{"name": "John Doe", "zone": "A", "available": true}'
    
    # Create a pricing rule for A to B
-   curl -X POST "http://localhost:8002/prices" \
-     -H "Content-Type: application/json" \
-     -d '{"from_zone": "A", "to_zone": "B", "amount": 12.50}'
-   ```
+   curl -X POST "http://localhost:8002/prices" -H "Content-Type: application/json" -d '{"from_zone": "A", "to_zone": "B", "amount": 12.50}'
+      ```
 
 3. **Test Complete Ride Flow:**
    ```bash
-   # Create a ride (this orchestrates all services)
-   curl -X POST "http://localhost:8004/rides" \
-     -H "Content-Type: application/json" \
-     -d '{"passenger_name": "Alice", "from_zone": "A", "to_zone": "B"}'
+   # Create a ride (this orchestrates all services) 
+   curl -X POST "http://localhost:8004/rides" -H "Content-Type: application/json" -d '{"passenger_name": "Alice", "from_zone": A", "to_zone": "B"}'
    ```
 
 4. **Interactive API Documentation:**
